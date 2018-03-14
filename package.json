@@ -1,0 +1,31 @@
+{
+  "name": "top-the-ocr-project",
+  "version": "1.0.0",
+  "description": "This project is developed in order to explore the current OCR technology capabilities.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mentoring-projects/TOP-The-OCR-Project.git"
+  },
+  "keywords": [
+    "OCR"
+  ],
+  "author": "Gabriel R. Sezefredo and Gustavo Porto Guedes",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mentoring-projects/TOP-The-OCR-Project/issues"
+  },
+  "homepage": "https://github.com/mentoring-projects/TOP-The-OCR-Project#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "dotenv": "^5.0.1",
+    "express": "^4.16.2",
+    "morgan": "^1.9.0",
+    "multer": "^1.3.0",
+    "node-tesseract": "^0.2.7"
+  }
+}
