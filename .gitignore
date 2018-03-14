@@ -57,3 +57,8 @@ typings/
 # dotenv environment variables file
 .env
 
+# Multer files
+uploads
+
+# Static content
+public
