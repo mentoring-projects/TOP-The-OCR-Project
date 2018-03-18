@@ -39,4 +39,4 @@ app.post('/v1/convert/ocr', upload.single('file_img'), (req, res) => {
  });
 
 
-app.listen(process.env.PORT);
+app.listen(process.env.PORT,() => console.log(`Server listening at port ${process.env.PORT}`));
