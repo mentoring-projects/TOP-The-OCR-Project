@@ -62,3 +62,6 @@ uploads
 
 # Static content
 public
+
+# IDE folders
+.vscode
