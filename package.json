@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/mentoring-projects/TOP-The-OCR-Project#readme",
   "dependencies": {
+    "@cloudant/cloudant": "^2.1.0",
     "body-parser": "^1.18.2",
     "dotenv": "^5.0.1",
     "express": "^4.16.2",
