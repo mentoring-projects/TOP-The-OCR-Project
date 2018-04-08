@@ -1,3 +1,5 @@
+const httpStatus = require('../../lib/http-status-codes');
+
 const menus = require('express').Router();
 
 const getAll = require('./getAll');
@@ -17,5 +19,11 @@ menus.get('/:id', getOne);
 menus.post('/', create);
 menus.delete('/:id', del);
 menus.use('/:id/ocr', ocr);
+
+// Error Handler for menus
+menus.use(function (err, req, res, next) {
+    console.log(err.stack);
+    res.status(err.status || httpStatus.INTERNAL_SERVER_ERROR).send(err.message);
+});
 
 module.exports = menus;
