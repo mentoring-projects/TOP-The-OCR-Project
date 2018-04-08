@@ -11,9 +11,9 @@ const del = require('./delete');
 const ocr = require('./ocr');
 
 // If query string is present, we redirect it to another end-point
-menus.get('/', (req, res) => {
-    if (req.query.from || req.query.size) return slice(req, res);
-    return getAll(req, res);
+menus.get('/', (req, res, next) => {
+    if (req.query.from || req.query.size) return slice(req, res, next);
+    return getAll(req, res, next);
 });
 menus.get('/:id', getOne);
 menus.post('/', create);
