@@ -25,13 +25,13 @@ module.exports = (req, res, next) => {
 
     // Uploading to box and saving to db
     let fsClient = new FSClient();
-    let dbClient = new DBClient();
+    let dbClient = new DBClient('menus');
     fsClient.uploadMenu(req.file)
         .then(id => {
             menuEntry.file = `/files/${id}`
             return deleteFile(req.file.path);
         })
-        .then(() => dbClient.insert(menuEntry, 'menus'))
+        .then(() => dbClient.insert(menuEntry))
         .then(dbEntry => res.status(httpStatus.OK_CREATED).send(Object.assign(dbEntry, menuEntry)))
         .catch((err) => {
             return next(err) // Handled by the "menus" specific error handler, in menus/index.js
