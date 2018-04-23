@@ -3,6 +3,7 @@ const DBClient = require('../../lib/DBClient');
 const fs = require('fs');
 
 const httpStatus = require('../../lib/http-status-codes');
+const errorMessages = require('../../lib/error-messages');
 
 module.exports = (req, res, next) => {
     let menuEntry = {
@@ -17,7 +18,7 @@ module.exports = (req, res, next) => {
     // Check if request is missing parameters
     for (let k in menuEntry.restaurant){
         if (typeof menuEntry.restaurant[k] === 'undefined' || menuEntry.restaurant[k] === ''){
-            let err = new Error(`Missing field "restaurant_${k}"`);
+            let err = new Error(errorMessages.MISSING_FIELD_ERROR(k));
             err.status = httpStatus.BAD_REQUEST;
             throw err;
         }
@@ -44,7 +45,7 @@ function deleteFile(path) {
         fs.unlink(path, err => {
             if (err) {
                 console.log(err.stack);
-                return rej(new Error('Error while trying to delete the temporary file'));
+                return rej(new Error(errorMessages.IO_ERROR(path)));
             }
             return res();
         })
