@@ -3,6 +3,7 @@ const MulterConfig = require('../../lib/MulterConfig');
 const upload = new MulterConfig('menus');
 
 const httpStatus = require('../../lib/http-status-codes');
+const errorMessages = require('../../lib/error-messages');
 
 const menus = require('express').Router();
 
@@ -32,7 +33,7 @@ menus.use(function (err, req, res, next) {
         We should think about improving it later on.
     */
     if (err.code === 'LIMIT_FILE_SIZE') {
-        err.message += `, maximum file size: ${upload.limits.fileSize/1024/1024}MB`;
+        err.message = errorMessages.LIMIT_FILE_SIZE_ERROR(upload.limits.fileSize)
         err.status = httpStatus.BAD_REQUEST;
     }
 

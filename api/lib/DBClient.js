@@ -3,9 +3,11 @@ const Cloudant = require('@cloudant/cloudant');
 const user = process.env.CLOUDANT_USER;
 const pw = process.env.CLOUDANT_PW;
 
+const errorMessages = require('./error-messages');
+
 function DBClient(db) {
     if (db && typeof db !== 'string')
-        throw new Error(`DBClient db parameter must be of type string, ${typeof db} received.`);
+        throw new Error(errorMessages.TYPE_MISMATCH_ERROR('db', 'string', typeof db));
     this._db = db || null;
     this._client = Cloudant({account:user, password:pw});
 }
@@ -41,9 +43,8 @@ module.exports = DBClient;
 function validateDB(instance, options) {
     if (!instance._db){
         if (!(options && options.db))
-            throw new Error('This client has no default databaset set, and one was not provided.');
+            throw new Error(errorMessages.NO_DB_ERROR());
         if (typeof options.db !== 'string')
-            throw new Error(`Wrong type for parameter DB. ` +
-                `Received ${typeof options.db}, expected a string.`);
+            throw new Error(errorMessages.TYPE_MISMATCH_ERROR('db', 'string', typeof options.db));
     }
 }
