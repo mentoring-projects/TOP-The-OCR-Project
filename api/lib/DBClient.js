@@ -9,21 +9,36 @@ function DBClient(db) {
     if (db && typeof db !== 'string')
         throw new Error(errorMessages.TYPE_MISMATCH_ERROR('db', 'string', typeof db));
     this._db = db || null;
-    this._client = Cloudant({account:user, password:pw});
+    this._client = Cloudant({ account: user, password: pw });
 }
 
-DBClient.prototype.get = function(db, from, size) {
+DBClient.prototype.get = function (db, from, size) {
     return new Promise((res, rej) => {
         let database = this._client.db.use(db);
-        database.list({include_docs: true, skip: from, limit: size},
-            function(err, body) {
+        database.list({ include_docs: true, skip: from, limit: size },
+            function (err, body) {
                 if (err) return rej(err);
                 return res(body.rows);
             });
     });
 }
 
-DBClient.prototype.insert = function(doc, options) {
+DBClient.prototype.getById = function (id, options) {
+    validateDB(this, options)
+    let db = this._db || options.db;
+    if (typeof id !== 'string')
+        throw new Error(errorMessages.TYPE_MISMATCH_ERROR('id', 'string', typeof id));
+    console.log(id);
+    return new Promise((res, rej) => {
+        let database = this._client.db.use(db);
+        database.get(id, function (err, body) {
+            if (err) return rej(err);
+            return res(body);
+        });
+    });
+}
+
+DBClient.prototype.insert = function (doc, options) {
     validateDB(this, options)
     let db = this._db || options.db;
     return new Promise((res, rej) => {
@@ -41,7 +56,7 @@ module.exports = DBClient;
 // Private functions
 
 function validateDB(instance, options) {
-    if (!instance._db){
+    if (!instance._db) {
         if (!(options && options.db))
             throw new Error(errorMessages.NO_DB_ERROR());
         if (typeof options.db !== 'string')
