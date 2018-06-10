@@ -33,7 +33,7 @@ module.exports = (req, res, next) => {
             return deleteFile(req.file.path);
         })
         .then(() => dbClient.insert(menuEntry))
-        .then(dbEntry => res.status(httpStatus.OK_CREATED).send(Object.assign(dbEntry, menuEntry)))
+        .then(dbEntry => res.status(httpStatus.OK_CREATED).send(dbEntry))
         .catch((err) => {
             return next(err) // Handled by the "menus" specific error handler, in menus/index.js
         });
