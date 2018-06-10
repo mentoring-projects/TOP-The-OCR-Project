@@ -1,4 +1,5 @@
 const Cloudant = require('@cloudant/cloudant');
+const JSONValidator = require('./JSONValidator');
 
 const user = process.env.CLOUDANT_USER;
 const pw = process.env.CLOUDANT_PW;
@@ -13,40 +14,59 @@ function DBClient(db) {
 }
 
 DBClient.prototype.get = function (db, from, size) {
+    const jsonValidator = new JSONValidator();
     return new Promise((res, rej) => {
-        let database = this._client.db.use(db);
+        const database = this._client.db.use(db);
         database.list({ include_docs: true, skip: from, limit: size },
             function (err, body) {
                 if (err) return rej(err);
-                return res(body.rows);
+                let list = []
+                body.rows.forEach((el) => {
+                    list.push(el.doc)
+                });
+                try {
+                    return res(jsonValidator.sanitizeList(list, db));
+                } catch (syncErr) {
+                    return rej(syncErr)
+                }
             });
     });
 }
 
 DBClient.prototype.getById = function (id, options) {
     validateDB(this, options)
-    let db = this._db || options.db;
-    if (typeof id !== 'string')
-        throw new Error(errorMessages.TYPE_MISMATCH_ERROR('id', 'string', typeof id));
-    console.log(id);
+    const jsonValidator = new JSONValidator();
+    const db = this._db || options.db;
     return new Promise((res, rej) => {
-        let database = this._client.db.use(db);
+        if (typeof id !== 'string')
+            return rej(new Error(errorMessages.TYPE_MISMATCH_ERROR('id', 'string', typeof id)));
+        const database = this._client.db.use(db);
         database.get(id, function (err, body) {
             if (err) return rej(err);
-            return res(body);
+            try {
+                return res(jsonValidator.sanitize(body, db));
+            } catch (validateError) {
+                return rej(validateError);
+            }
         });
     });
 }
 
 DBClient.prototype.insert = function (doc, options) {
     validateDB(this, options)
-    let db = this._db || options.db;
+    const jsonValidator = new JSONValidator();
+    const db = this._db || options.db;
     return new Promise((res, rej) => {
-        let database = this._client.db.use(db);
+        if (!jsonValidator.isValid(doc, db))
+            return rej(new Error(errorMessages.INVALID_SCHEMA_FIELDS_ERROR(db, jsonValidator.getSchema(db))));
+        const database = this._client.db.use(db);
         database.insert(doc, (err, body, header) => {
             if (err) return rej(err);
-            if (body.ok) return res(body);
-            else return rej(body);
+            if (body.ok) {
+                doc._id = body.id;
+                doc._rev = body.rev;
+                return res(doc);
+            } else return rej(body);
         });
     });
 }
