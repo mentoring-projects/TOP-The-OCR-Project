@@ -71,6 +71,10 @@ DBClient.prototype.insert = function (doc, options) {
     });
 }
 
+DBClient.prototype.update = function(doc, options) {
+    return this.insert(doc, options);
+}
+
 module.exports = DBClient;
 
 // Private functions
