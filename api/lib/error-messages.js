@@ -30,6 +30,9 @@ module.exports.INVALID_SCHEMA_FIELDS_ERROR = function(schemaName, schemaStructur
     return `${schemaName} schema must be like that: \n ${schemaStructure}`;
 }
 
+module.exports.OCR_INDEX_OUT_OF_BOUNDS_ERROR = (docLen) => `The OCR index requested is not valid for ` +
+                                                           `this document, document length: ${docLen}`
+
 module.exports.INTERNAL_SERVER_ERROR = () => 'The server encountered an error and could not complete ' +
                                               'your request. Please try again later.';
 
