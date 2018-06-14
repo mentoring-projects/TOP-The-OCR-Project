@@ -4,6 +4,8 @@ const path = require('path');
 
 const appRoot = process.env.BOX_ROOT;
 
+const errorMessages = require('./error-messages');
+
 function FSClient() {
     // Read and parse the automatically created Box configuration file.
     let configFile = fs.readFileSync(path.dirname(require.main.filename)+'/config.json');
@@ -41,8 +43,6 @@ FSClient.prototype.upload = function(fileName, fileStream, folderId) {
     });
 }
 
-
-
 FSClient.prototype.getFolderId = function(folder, parentId){
     if (!parentId) parentId = 0;
 
@@ -59,6 +59,17 @@ FSClient.prototype.getFolderId = function(folder, parentId){
                 return res('-1');
             }
         );
+    })
+}
+
+FSClient.prototype.delete = function(fileId){
+    if (!fileId || typeof fileId !== 'string')
+        throw new Error(errorMessages.TYPE_MISMATCH_ERROR(fileId, 'string', typeof fileId));
+    return new Promise((res, rej) => {
+        this._client.del(fileId, null, (err, resp) => {
+            if (err) rej(err);
+            return res(resp);
+        });
     })
 }
 
