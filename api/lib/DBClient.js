@@ -75,6 +75,22 @@ DBClient.prototype.update = function(doc, options) {
     return this.insert(doc, options);
 }
 
+DBClient.prototype.delete = function(id, rev, options) {
+    if (!id || typeof id !== 'string')
+        throw new Error(errorMessages.TYPE_MISMATCH_ERROR('id', 'string', typeof id));
+    if (!rev || typeof rev !== 'string')
+        throw new Error(errorMessages.TYPE_MISMATCH_ERROR('rev', 'string', typeof rev));
+    validateDB(this, options)
+    const db = this._db || options.db;
+    const database = this._client.db.use(db);
+    return new Promise((res, rej) => {
+        database.destroy(id, rev, (err, body) => {
+            if (err) return rej(err);
+            return res(body);
+        })
+    });
+}
+
 module.exports = DBClient;
 
 // Private functions
