@@ -1,12 +1,12 @@
 const DBClient = require('../../lib/DBClient');
 const httpStatus = require('../../lib/http-status-codes');
 
-const dbInstance = new DBClient();
+const dbInstance = new DBClient('menus');
 
 const errorMessages = require('../../lib/error-messages');
 
 module.exports = (req, res, next) => {
-    dbInstance.get('menus')
+    dbInstance.get()
         .then((resp) => res.status(httpStatus.OK).json(resp))
         .catch((error) => {
             console.log(error.stack);
