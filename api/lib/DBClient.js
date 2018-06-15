@@ -13,11 +13,18 @@ function DBClient(db) {
     this._client = Cloudant({ account: user, password: pw });
 }
 
-DBClient.prototype.get = function (db, from, size) {
+DBClient.prototype.get = function (options) {
+    if (typeof options !== 'object')
+        options = {
+            from: undefined,
+            size: undefined
+        }
+    validateDB(this, options)
     const jsonValidator = new JSONValidator();
+    const db = this._db || options.db;
     return new Promise((res, rej) => {
         const database = this._client.db.use(db);
-        database.list({ include_docs: true, skip: from, limit: size },
+        database.list({ include_docs: true, skip: options.from, limit: options.size },
             function (err, body) {
                 if (err) return rej(err);
                 let list = []
