@@ -2,6 +2,10 @@ module.exports.TYPE_MISMATCH_ERROR = function(parameter, expected, received) {
     return `Wrong type for parameter ${parameter}. Received ${received}, expected ${expected}`;
 }
 
+module.exports.FILE_TYPE_MISMATCH_ERROR = function(expected, received) {
+    return `Wrong file type. Received ${received}, expected ${expected}`;
+}
+
 module.exports.MISSING_FIELD_ERROR = function(field) {
     return `Missing field "${field}"`;
 }
