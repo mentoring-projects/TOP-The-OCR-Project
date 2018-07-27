@@ -29,9 +29,9 @@ function FSClient() {
 
 FSClient.prototype.uploadMenu = function(file) {
     var stream = fs.createReadStream(file.path);
-    return this.getFolderId(appRoot)
-        .then((id) => this.getFolderId('upload', id))
-        .then((id) => this.upload(`${file.filename}.pdf`, stream, id));
+    return this.getFolderId(appRoot) // finds main folder id
+        .then((id) => this.getFolderId('upload', id)) // finds upload folder id
+        .then((id) => this.upload(`${file.filename}`, stream, id));
 }
 
 FSClient.prototype.upload = function(fileName, fileStream, folderId) {
@@ -45,7 +45,6 @@ FSClient.prototype.upload = function(fileName, fileStream, folderId) {
 
 FSClient.prototype.getFolderId = function(folder, parentId){
     if (!parentId) parentId = 0;
-
     return new Promise((res, rej) => {
         this._client.folders.getItems(
             parentId,
