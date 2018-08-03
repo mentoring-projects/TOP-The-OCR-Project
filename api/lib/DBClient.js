@@ -22,6 +22,7 @@ DBClient.prototype.get = function (options) {
     validateDB(this, options)
     const jsonValidator = new JSONValidator();
     const db = this._db || options.db;
+    const schemaName = options && options.schemaName ? options.schemaName : this._db || options.db;
     return new Promise((res, rej) => {
         const database = this._client.db.use(db);
         database.list({ include_docs: true, skip: options.from, limit: options.size },
@@ -32,7 +33,7 @@ DBClient.prototype.get = function (options) {
                     list.push(el.doc)
                 });
                 try {
-                    return res(jsonValidator.sanitizeList(list, db));
+                    return res(jsonValidator.sanitizeList(list, schemaName));
                 } catch (syncErr) {
                     return rej(syncErr)
                 }
@@ -44,6 +45,7 @@ DBClient.prototype.getById = function (id, options) {
     validateDB(this, options)
     const jsonValidator = new JSONValidator();
     const db = this._db || options.db;
+    const schemaName = options && options.schemaName ? options.schemaName : this._db || options.db;
     return new Promise((res, rej) => {
         if (typeof id !== 'string')
             return rej(new Error(errorMessages.TYPE_MISMATCH_ERROR('id', 'string', typeof id)));
@@ -51,7 +53,7 @@ DBClient.prototype.getById = function (id, options) {
         database.get(id, function (err, body) {
             if (err) return rej(err);
             try {
-                return res(jsonValidator.sanitize(body, db));
+                return res(jsonValidator.sanitize(body, schemaName));
             } catch (validateError) {
                 return rej(validateError);
             }
@@ -63,9 +65,10 @@ DBClient.prototype.insert = function (doc, options) {
     validateDB(this, options)
     const jsonValidator = new JSONValidator();
     const db = this._db || options.db;
+    const schemaName = options && options.schemaName ? options.schemaName : this._db || options.db;
     return new Promise((res, rej) => {
-        if (!jsonValidator.isValid(doc, db))
-            return rej(new Error(errorMessages.INVALID_SCHEMA_FIELDS_ERROR(db, jsonValidator.getSchema(db))));
+        if (!jsonValidator.isValid(doc, schemaName))
+            return rej(new Error(errorMessages.INVALID_SCHEMA_FIELDS_ERROR(schemaName, jsonValidator.getSchema(schemaName))));
         const database = this._client.db.use(db);
         database.insert(doc, (err, body, header) => {
             if (err) return rej(err);
@@ -78,11 +81,11 @@ DBClient.prototype.insert = function (doc, options) {
     });
 }
 
-DBClient.prototype.update = function(doc, options) {
+DBClient.prototype.update = function (doc, options) {
     return this.insert(doc, options);
 }
 
-DBClient.prototype.delete = function(id, rev, options) {
+DBClient.prototype.delete = function (id, rev, options) {
     if (!id || typeof id !== 'string')
         throw new Error(errorMessages.TYPE_MISMATCH_ERROR('id', 'string', typeof id));
     if (!rev || typeof rev !== 'string')
