@@ -1,0 +1,42 @@
+language: node_js
+node_js:
+- "8"
+sudo: required
+dist: trusty
+
+env:
+  global:
+    - APP_NAME=top-the-ocr-project
+    - APP_VERSION="$(git log -n 1 --pretty=format:%h -- .)$RANDOM"
+    - NUMBER_INSTANCES: 1
+    - MEMORY_SIZE: 256M
+
+before_install:
+  - chmod +x deployCloudFoundry.sh
+
+install:
+  - sudo apt-get install ghostscript
+  - sudo apt-get install libgs-dev
+  - sudo ln -s /usr/lib/libgs.so /usr/lib/x86_64-linux-gnu/libgs.so
+  - sudo apt-get install tesseract-ocr
+  - sudo apt-get install libtesseract-dev
+  - npm i -g jasmine
+  - npm i -g istanbul
+  - npm i
+
+script:
+  # Coverage check
+  - istanbul cover ./node_modules/jasmine/bin/jasmine.js
+
+before_deploy:
+  - export TESSDATA_PREFIX=~/Downloads/
+
+deploy:
+  - provider: script
+    skip_cleanup: true
+    script: ./deployCloudFoundry.sh
+    on:
+      repo: mentoring-projects/TOP-The-OCR-Project
+      type: push
+      branch:
+        - master
